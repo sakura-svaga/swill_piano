@@ -1,4 +1,3 @@
--- piano_ui.lua
 local UI = {}
 _G.SWILL_UI = UI
 local Core = _G.SWILL_Core
@@ -128,5 +127,5 @@ function UI.makePage(name)
     local p = UI.new("ScrollingFrame", { Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, ScrollBarThickness = 3, AutomaticCanvasSize = Enum.AutomaticSize.Y, CanvasSize = UDim2.new(), Visible = false }, UI.content)
     UI.new("UIListLayout", { Padding = UDim.new(0, 10) }, p); UI.pages[name] = p; return p
 end
-UI.createTab("home", "⌂ Главная"); UI.createTab("play", "♪ Игра"); UI.createTab("anti", "◈ Антискрипт"); UI.createTab("set", "⚙ Настройки")
-UI.pageHome, UI.pagePlay, UI.pageAnti, UI.pageSet = UI.makePage("home"), UI.makePage("play"), UI.makePage("anti"), UI.makePage("set")
+UI.createTab("home", "⌂ Главная"); UI.createTab("play", "♪ Игра"); UI.createTab("anti", "◈ Антискрипт"); UI.createTab("set", "⚙ Настройки"); UI.createTab("guide", "? Гайд")
+UI.pageHome, UI.pagePlay, UI.pageAnti, UI.pageSet, UI.pageGuide = UI.makePage("home"), UI.makePage("play"), UI.makePage("anti"), UI.makePage("set"), UI.makePage("guide")
