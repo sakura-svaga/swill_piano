@@ -7,7 +7,6 @@ local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
-local VirtualUser = game:GetService("VirtualUser")
 local camera = workspace.CurrentCamera
 local playerGui = Players.LocalPlayer:WaitForChild("PlayerGui")
 
@@ -21,13 +20,12 @@ UI.S = {
     uiScale = 1, accent = 1, girlName = "Саша",
 }
 UI.savedSongs = Core.loadSongs()
-UI.rnd = Random.new()
 UI.conns = {}
-function UI.track(c) UI.conns[#UI.conns + 1] = c return c end
 
 UI.BG0, UI.BG1, UI.BG2 = Color3.fromRGB(15, 15, 17), Color3.fromRGB(28, 28, 32), Color3.fromRGB(42, 42, 47)
 UI.BUB, UI.TXT, UI.DIM, UI.LINE = Color3.fromRGB(38, 38, 43), Color3.fromRGB(228, 228, 233), Color3.fromRGB(136, 136, 146), Color3.fromRGB(56, 56, 62)
 UI.ACCENTS = { { name = "Золото", c = Color3.fromRGB(201, 162, 39) }, { name = "Роза", c = Color3.fromRGB(255, 138, 178) }, { name = "Небо", c = Color3.fromRGB(96, 160, 255) }, { name = "Мята", c = Color3.fromRGB(110, 222, 170) } }
+
 function UI.ACC() return UI.ACCENTS[UI.S.accent].c end
 
 UI.accRefs = {}
@@ -113,18 +111,18 @@ local header = UI.new("Frame", { Size = UDim2.new(1, 0, 0, 44), BackgroundTransp
 local minBtn = UI.new("TextButton", { Size = UDim2.fromOffset(28, 28), Position = UDim2.new(1, -114, 0, 12), BackgroundColor3 = UI.BG1, Font = Enum.Font.GothamBold, TextSize = 13, TextColor3 = UI.DIM, Text = "–" }, header); UI.corner(minBtn, UDim.new(1, 0))
 local closeBtn = UI.new("TextButton", { Size = UDim2.fromOffset(28, 28), Position = UDim2.new(1, -42, 0, 12), BackgroundColor3 = UI.BG1, Font = Enum.Font.GothamBold, TextSize = 13, TextColor3 = UI.DIM, Text = "✕" }, header); UI.corner(closeBtn, UDim.new(1, 0))
 UI.dragging, UI.dragStart, UI.startPos = false, nil, nil
-UI.track(header.InputBegan:Connect(function(input)
+UI.conns[#UI.conns + 1] = header.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
         UI.dragging, UI.dragStart, UI.startPos = true, input.Position, UI.main.Position
         input.Changed:Connect(function() if input.UserInputState == Enum.UserInputState.End then UI.dragging = false end end)
     end
-end))
-UI.track(UIS.InputChanged:Connect(function(input)
+end)
+UI.conns[#UI.conns + 1] = UIS.InputChanged:Connect(function(input)
     if UI.dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
         local d = (input.Position - UI.dragStart) / UI.scaleObj.Scale
         UI.main.Position = UDim2.new(UI.startPos.X.Scale, UI.startPos.X.Offset + d.X, UI.startPos.Y.Scale, UI.startPos.Y.Offset + d.Y)
     end
-end))
+end)
 minBtn.Activated:Connect(UI.toggleWindow); closeBtn.Activated:Connect(UI.toggleWindow)
 
 UI.tabsFrame = UI.new("Frame", { AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, -10, 0, 46), Size = UDim2.fromOffset(0, 38), AutomaticSize = Enum.AutomaticSize.X, BackgroundColor3 = Color3.fromRGB(22, 22, 25), ZIndex = 5 }, UI.main)
