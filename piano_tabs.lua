@@ -22,9 +22,9 @@ end
 UI.inputBar = UI.new("Frame", { Position = UDim2.new(0, 0, 1, -52), Size = UDim2.new(1, 0, 0, 52), BackgroundColor3 = Color3.fromRGB(24, 24, 27) }, UI.pageHome)
 UI.corner(UI.inputBar, UDim.new(1, 0)); UI.stroke(UI.inputBar, UI.LINE, 1)
 UI.melodyBox = UI.new("TextBox", { Position = UDim2.fromOffset(15, 0), Size = UDim2.new(1, -180, 1, 0), BackgroundTransparency = 1, Font = Enum.Font.Code, TextSize = 14, TextColor3 = UI.TXT, PlaceholderText = "Вставь мелодию...", PlaceholderColor3 = UI.DIM, ClearTextOnFocus = false, TextXAlignment = Enum.TextXAlignment.Left }, UI.inputBar)
-UI.sendBtn = UI.new("TextButton", { AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -8, 0.5, 0), Size = UDim2.fromOffset(40, 40), BackgroundColor3 = UI.ACC, Text = "▶", Font = Enum.Font.GothamBold, TextSize = 16, TextColor3 = Color3.new(0,0,0) }, UI.inputBar); UI.corner(UI.sendBtn, 12)
+UI.sendBtn = UI.new("TextButton", { AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -8, 0.5, 0), Size = UDim2.fromOffset(40, 40), BackgroundColor3 = UI.ACC(), Text = "▶", Font = Enum.Font.GothamBold, TextSize = 16, TextColor3 = Color3.new(0,0,0) }, UI.inputBar); UI.corner(UI.sendBtn, 12)
 
-UI.playBtn = UI.new("TextButton", { Size = UDim2.fromOffset(100, 40), BackgroundColor3 = UI.ACC, Text = "▶ Играть", Font = Enum.Font.GothamBold, TextSize = 13, TextColor3 = Color3.new(0,0,0) }, UI.pageHome); UI.corner(UI.playBtn, 10)
+UI.playBtn = UI.new("TextButton", { Size = UDim2.fromOffset(100, 40), BackgroundColor3 = UI.ACC(), Text = "▶ Играть", Font = Enum.Font.GothamBold, TextSize = 13, TextColor3 = Color3.new(0,0,0) }, UI.pageHome); UI.corner(UI.playBtn, 10)
 UI.stopBtn = UI.new("TextButton", { Size = UDim2.fromOffset(100, 40), BackgroundColor3 = UI.BG2, Text = "■ Стоп", Font = Enum.Font.GothamBold, TextSize = 13, TextColor3 = UI.TXT }, UI.pageHome); UI.corner(UI.stopBtn, 10)
 UI.clearBtn = UI.new("TextButton", { Size = UDim2.fromOffset(100, 40), BackgroundColor3 = UI.BG2, Text = "Очистить", Font = Enum.Font.GothamBold, TextSize = 13, TextColor3 = UI.TXT }, UI.pageHome); UI.corner(UI.clearBtn, 10)
 
@@ -32,9 +32,9 @@ UI.clearBtn = UI.new("TextButton", { Size = UDim2.fromOffset(100, 40), Backgroun
 function UI.addSlider(parent, key, label, min, max)
     local f = UI.new("Frame", { Size = UDim2.new(1, 0, 0, 50), BackgroundColor3 = UI.BG1 }, parent); UI.corner(f, 10)
     UI.new("TextLabel", { BackgroundTransparency = 1, Position = UDim2.fromOffset(10, 5), Size = UDim2.new(1, 0, 0, 20), Font = Enum.Font.Gotham, TextSize = 13, TextXAlignment = Enum.TextXAlignment.Left, TextColor3 = UI.TXT, Text = label }, f)
-    local val = UI.new("TextLabel", { BackgroundTransparency = 1, Position = UDim2.new(1, -80, 0, 5), Size = UDim2.fromOffset(70, 20), Font = Enum.Font.GothamBold, TextSize = 13, TextColor3 = UI.ACC, Text = tostring(UI.S[key]) }, f)
+    local val = UI.new("TextLabel", { BackgroundTransparency = 1, Position = UDim2.new(1, -80, 0, 5), Size = UDim2.fromOffset(70, 20), Font = Enum.Font.GothamBold, TextSize = 13, TextColor3 = UI.ACC(), Text = tostring(UI.S[key]) }, f)
     local bar = UI.new("TextButton", { Position = UDim2.fromOffset(10, 35), Size = UDim2.new(1, -20, 0, 6), BackgroundColor3 = UI.BG2, Text = "" }, f); UI.corner(bar, UDim.new(1,0))
-    local fill = UI.new("Frame", { Size = UDim2.fromScale((UI.S[key] - min) / (max - min), 1), BackgroundColor3 = UI.ACC }, bar); UI.corner(fill, UDim.new(1,0))
+    local fill = UI.new("Frame", { Size = UDim2.fromScale((UI.S[key] - min) / (max - min), 1), BackgroundColor3 = UI.ACC() }, bar); UI.corner(fill, UDim.new(1,0))
     bar.MouseButton1Click:Connect(function() UI.S[key] = math.floor(min + (max - min) * 0.5); val.Text = tostring(UI.S[key]); fill.Size = UDim2.fromScale(0.5, 1) end)
 end
 UI.addSlider(UI.pagePlay, "tempo", "Темп (мс)", 10, 300)
@@ -74,7 +74,7 @@ UI.clearBtn.Activated:Connect(function() UI.melodyBox.Text = "" end)
 local frames, accT, fps, ping = 0, 0, 0, 0
 local t, phase = 0, 0
 local RunService = game:GetService("RunService")
-UI.track(RunService.Heartbeat:Connect(function(dt)
+UI.conns[#UI.conns + 1] = RunService.Heartbeat:Connect(function(dt)
     t = t + dt; frames = frames + 1; accT = accT + dt
     if accT >= 0.5 then fps = math.floor(frames / accT + 0.5); frames, accT = 0, 0; pcall(function() ping = math.floor(game:GetService("Players").LocalPlayer:GetNetworkPing() * 2000) end); if not UI.islandPlaying then UI.statsLabel.Text = string.format("FPS: %d | Ping: %d", fps, ping) end end
     
@@ -88,7 +88,7 @@ UI.track(RunService.Heartbeat:Connect(function(dt)
         local sw = math.sin(phase) * (UI.state.playing and 15 or 8)
         UI.legL.Rotation = sw; UI.legR.Rotation = -sw
     end
-end))
+end)
 
 UI.switchTab("home")
 UI.scaleObj.Scale = UI.baseScale()
