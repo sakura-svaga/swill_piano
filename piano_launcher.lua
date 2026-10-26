@@ -1,3 +1,5 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/sakura-svaga/swill_piano/main/piano_core.lua"))()
-task.wait(0.5)
+task.wait(0.3)
 loadstring(game:HttpGet("https://raw.githubusercontent.com/sakura-svaga/swill_piano/main/piano_ui.lua"))()
+task.wait(0.3)
+loadstring(game:HttpGet("https://raw.githubusercontent.com/sakura-svaga/swill_piano/main/piano_tabs.lua"))()
