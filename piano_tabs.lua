@@ -1,8 +1,9 @@
+-- piano_tabs.lua
 local UI = _G.SWILL_UI
 local Core = _G.SWILL_Core
 if not UI or not Core then return warn("Ошибка: UI или Core не загружены") end
 
--- Вкладка Главная
+-- Главная вкладка
 UI.chatScroll = UI.new("ScrollingFrame", { Position = UDim2.fromOffset(0, 0), Size = UDim2.new(1, 0, 1, -60), BackgroundTransparency = 1, ScrollBarThickness = 3, AutomaticCanvasSize = Enum.AutomaticSize.Y, CanvasSize = UDim2.new() }, UI.pageHome)
 UI.new("UIListLayout", { Padding = UDim.new(0, 10) }, UI.chatScroll)
 UI.msgOrder, UI.msgRows = 0, {}
@@ -23,7 +24,6 @@ UI.inputBar = UI.new("Frame", { Position = UDim2.new(0, 0, 1, -52), Size = UDim2
 UI.corner(UI.inputBar, UDim.new(1, 0)); UI.stroke(UI.inputBar, UI.LINE, 1)
 UI.melodyBox = UI.new("TextBox", { Position = UDim2.fromOffset(15, 0), Size = UDim2.new(1, -180, 1, 0), BackgroundTransparency = 1, Font = Enum.Font.Code, TextSize = 14, TextColor3 = UI.TXT, PlaceholderText = "Вставь мелодию...", PlaceholderColor3 = UI.DIM, ClearTextOnFocus = false, TextXAlignment = Enum.TextXAlignment.Left }, UI.inputBar)
 UI.sendBtn = UI.new("TextButton", { AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -8, 0.5, 0), Size = UDim2.fromOffset(40, 40), BackgroundColor3 = UI.ACC(), Text = "▶", Font = Enum.Font.GothamBold, TextSize = 16, TextColor3 = Color3.new(0,0,0) }, UI.inputBar); UI.corner(UI.sendBtn, 12)
-
 UI.playBtn = UI.new("TextButton", { Size = UDim2.fromOffset(100, 40), BackgroundColor3 = UI.ACC(), Text = "▶ Играть", Font = Enum.Font.GothamBold, TextSize = 13, TextColor3 = Color3.new(0,0,0) }, UI.pageHome); UI.corner(UI.playBtn, 10)
 UI.stopBtn = UI.new("TextButton", { Size = UDim2.fromOffset(100, 40), BackgroundColor3 = UI.BG2, Text = "■ Стоп", Font = Enum.Font.GothamBold, TextSize = 13, TextColor3 = UI.TXT }, UI.pageHome); UI.corner(UI.stopBtn, 10)
 UI.clearBtn = UI.new("TextButton", { Size = UDim2.fromOffset(100, 40), BackgroundColor3 = UI.BG2, Text = "Очистить", Font = Enum.Font.GothamBold, TextSize = 13, TextColor3 = UI.TXT }, UI.pageHome); UI.corner(UI.clearBtn, 10)
@@ -41,7 +41,23 @@ UI.addSlider(UI.pagePlay, "tempo", "Темп (мс)", 10, 300)
 UI.addSlider(UI.pagePlay, "speed", "Скорость", 0.5, 2)
 UI.addSlider(UI.pagePlay, "transpose", "Транспонирование", -12, 12)
 
--- Логика плеера и анимаций
+-- Вкладка Антискрипт
+UI.antiBtn = UI.new("TextButton", { Size = UDim2.new(1, 0, 0, 50), BackgroundColor3 = UI.BG2, Text = "Антискрипт: ВЫКЛ", Font = Enum.Font.GothamBold, TextSize = 14, TextColor3 = UI.TXT }, UI.pageAnti); UI.corner(UI.antiBtn, 10)
+UI.antiBtn.Activated:Connect(function()
+    UI.S.anti = not UI.S.anti
+    UI.antiBtn.Text = UI.S.anti and "Антискрипт: ВКЛ" or "Антискрипт: ВЫКЛ"
+    UI.antiBtn.BackgroundColor3 = UI.S.anti and UI.ACC() or UI.BG2
+end)
+
+-- Вкладка Настройки (Смена цвета)
+UI.colorFrame = UI.new("Frame", { Size = UDim2.new(1, 0, 0, 50), BackgroundColor3 = UI.BG1 }, UI.pageSet); UI.corner(UI.colorFrame, 10)
+UI.new("TextLabel", { BackgroundTransparency = 1, Position = UDim2.fromOffset(10, 15), Size = UDim2.fromOffset(150, 20), Font = Enum.Font.Gotham, TextSize = 13, TextColor3 = UI.TXT, Text = "Цвет акцента:" }, UI.colorFrame)
+for i, acc in ipairs(UI.ACCENTS) do
+    local btn = UI.new("TextButton", { Size = UDim2.fromOffset(30, 30), Position = UDim2.fromOffset(150 + (i-1)*40, 10), BackgroundColor3 = acc.c, Text = "" }, UI.colorFrame); UI.corner(btn, UDim.new(1,0))
+    btn.Activated:Connect(function() UI.S.accent = i; UI.cover.BackgroundColor3 = UI.ACC(); for _, b in ipairs(UI.eqBars) do b.BackgroundColor3 = UI.ACC() end end)
+end
+
+-- Логика плеера
 UI.state = { playing = false, id = 0, progress = 0 }
 function UI.playCurrent()
     if UI.state.playing or UI.melodyBox.Text:match("^%s*$") then return end
@@ -74,7 +90,7 @@ UI.clearBtn.Activated:Connect(function() UI.melodyBox.Text = "" end)
 local frames, accT, fps, ping = 0, 0, 0, 0
 local t, phase = 0, 0
 local RunService = game:GetService("RunService")
-UI.conns[#UI.conns + 1] = RunService.Heartbeat:Connect(function(dt)
+RunService.Heartbeat:Connect(function(dt)
     t = t + dt; frames = frames + 1; accT = accT + dt
     if accT >= 0.5 then fps = math.floor(frames / accT + 0.5); frames, accT = 0, 0; pcall(function() ping = math.floor(game:GetService("Players").LocalPlayer:GetNetworkPing() * 2000) end); if not UI.islandPlaying then UI.statsLabel.Text = string.format("FPS: %d | Ping: %d", fps, ping) end end
     
@@ -93,4 +109,3 @@ end)
 UI.switchTab("home")
 UI.scaleObj.Scale = UI.baseScale()
 UI.say("Привет! Я " .. UI.S.girlName .. ". Вставь мелодию, и я всё сыграю.")
-print("[SWILL] Всё загружено, интерфейс на месте.")
