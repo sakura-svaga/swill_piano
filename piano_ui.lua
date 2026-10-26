@@ -1,3 +1,4 @@
+-- piano_ui.lua
 local UI = {}
 _G.SWILL_UI = UI
 local Core = _G.SWILL_Core
@@ -5,7 +6,6 @@ if not Core then return warn("Ядро не загружено!") end
 
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 local camera = workspace.CurrentCamera
 local playerGui = Players.LocalPlayer:WaitForChild("PlayerGui")
@@ -20,16 +20,12 @@ UI.S = {
     uiScale = 1, accent = 1, girlName = "Саша",
 }
 UI.savedSongs = Core.loadSongs()
-UI.conns = {}
 
 UI.BG0, UI.BG1, UI.BG2 = Color3.fromRGB(15, 15, 17), Color3.fromRGB(28, 28, 32), Color3.fromRGB(42, 42, 47)
 UI.BUB, UI.TXT, UI.DIM, UI.LINE = Color3.fromRGB(38, 38, 43), Color3.fromRGB(228, 228, 233), Color3.fromRGB(136, 136, 146), Color3.fromRGB(56, 56, 62)
 UI.ACCENTS = { { name = "Золото", c = Color3.fromRGB(201, 162, 39) }, { name = "Роза", c = Color3.fromRGB(255, 138, 178) }, { name = "Небо", c = Color3.fromRGB(96, 160, 255) }, { name = "Мята", c = Color3.fromRGB(110, 222, 170) } }
 
 function UI.ACC() return UI.ACCENTS[UI.S.accent].c end
-
-UI.accRefs = {}
-function UI.acc(obj, prop) UI.accRefs[#UI.accRefs + 1] = { obj, prop }; obj[prop] = UI.ACC(); return obj end
 function UI.new(class, props, parent) local o = Instance.new(class); for k, v in pairs(props) do o[k] = v end; if parent then o.Parent = parent end; return o end
 function UI.corner(o, r) return UI.new("UICorner", { CornerRadius = typeof(r) == "UDim" and r or UDim.new(0, r) }, o) end
 function UI.stroke(o, c, th) return UI.new("UIStroke", { Color = c or UI.LINE, Thickness = th or 1, ApplyStrokeMode = Enum.ApplyStrokeMode.Border }, o) end
@@ -45,15 +41,15 @@ UI.corner(UI.island, UDim.new(1, 0)); UI.stroke(UI.island, UI.LINE, 1)
 UI.statsLabel = UI.new("TextLabel", { Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, Font = Enum.Font.GothamBold, TextSize = 12, TextColor3 = UI.TXT, Text = "" }, UI.island)
 
 UI.pg = UI.new("Frame", { Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, Visible = false }, UI.island)
-UI.cover = UI.new("Frame", { Position = UDim2.fromOffset(10, 9), Size = UDim2.fromOffset(32, 32) }, UI.pg); UI.acc(UI.cover, "BackgroundColor3"); UI.corner(UI.cover, 9)
+UI.cover = UI.new("Frame", { Position = UDim2.fromOffset(10, 9), Size = UDim2.fromOffset(32, 32) }, UI.pg); UI.cover.BackgroundColor3 = UI.ACC(); UI.corner(UI.cover, 9)
 UI.new("TextLabel", { Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, Font = Enum.Font.GothamBold, TextSize = 17, TextColor3 = Color3.fromRGB(20, 20, 22), Text = "♪" }, UI.cover)
 UI.titleClip = UI.new("Frame", { Position = UDim2.fromOffset(52, 7), Size = UDim2.fromOffset(186, 18), BackgroundTransparency = 1, ClipsDescendants = true }, UI.pg)
 UI.titleLbl = UI.new("TextLabel", { Size = UDim2.fromOffset(0, 18), AutomaticSize = Enum.AutomaticSize.X, BackgroundTransparency = 1, Font = Enum.Font.GothamBold, TextSize = 13, TextColor3 = UI.TXT, TextXAlignment = Enum.TextXAlignment.Left, Text = "" }, UI.titleClip)
 UI.subLbl = UI.new("TextLabel", { Position = UDim2.fromOffset(52, 25), Size = UDim2.fromOffset(186, 14), BackgroundTransparency = 1, Font = Enum.Font.Gotham, TextSize = 11, TextColor3 = UI.DIM, TextXAlignment = Enum.TextXAlignment.Left, Text = "" }, UI.pg)
 UI.eqBars = {}
-for i = 1, 4 do local b = UI.new("Frame", { AnchorPoint = Vector2.new(0, 1), Position = UDim2.fromOffset(264 + (i - 1) * 8, 36), Size = UDim2.fromOffset(5, 6) }, UI.pg); UI.acc(b, "BackgroundColor3"); UI.corner(b, 2); UI.eqBars[i] = b end
+for i = 1, 4 do local b = UI.new("Frame", { AnchorPoint = Vector2.new(0, 1), Position = UDim2.fromOffset(264 + (i - 1) * 8, 36), Size = UDim2.fromOffset(5, 6) }, UI.pg); b.BackgroundColor3 = UI.ACC(); UI.corner(b, 2); UI.eqBars[i] = b end
 UI.progTrack = UI.new("Frame", { Position = UDim2.fromOffset(52, 43), Size = UDim2.fromOffset(244, 3), BackgroundColor3 = UI.BG2 }, UI.pg); UI.corner(UI.progTrack, UDim.new(1, 0))
-UI.progFill = UI.new("Frame", { Size = UDim2.fromScale(0, 1) }, UI.progTrack); UI.acc(UI.progFill, "BackgroundColor3"); UI.corner(UI.progFill, UDim.new(1, 0))
+UI.progFill = UI.new("Frame", { Size = UDim2.fromScale(0, 1) }, UI.progTrack); UI.progFill.BackgroundColor3 = UI.ACC(); UI.corner(UI.progFill, UDim.new(1, 0))
 
 UI.islandPlaying = false
 function UI.setIslandPlaying(on)
@@ -67,6 +63,7 @@ UI.main = UI.new("Frame", { Size = UDim2.fromOffset(720, 480), Position = UDim2.
 UI.corner(UI.main, 20); UI.stroke(UI.main, UI.LINE, 1); UI.new("UIGradient", { Color = ColorSequence.new(Color3.fromRGB(24, 24, 27), Color3.fromRGB(11, 11, 13)), Rotation = 90 }, UI.main)
 UI.scaleObj = UI.new("UIScale", { Scale = 1 }, UI.main)
 function UI.baseScale() return math.clamp(math.min(camera.ViewportSize.X / 780, camera.ViewportSize.Y / 640), 0.45, 1) * UI.S.uiScale end
+
 UI.busy = false
 function UI.toggleWindow()
     if UI.busy then return end; UI.busy = true
@@ -82,12 +79,11 @@ local gp = { O = Color3.fromRGB(78, 64, 82), H = Color3.fromRGB(248, 236, 218), 
 local rep = string.rep
 UI.girlRows = { "OO", "OHHO", rep("O", 8), "OO"..rep("H", 8).."OO", "O".."HH".."BB"..rep("H", 8).."O", "O"..rep("H", 14).."O", "O".."HHH".."h"..rep("H", 6).."h".."HHH".."O", "O"..rep("H", 5).."SS".."HH".."SS"..rep("H", 5).."O", "O"..rep("H", 4)..rep("S", 8)..rep("H", 4).."O", "O"..rep("H", 3)..rep("S", 10)..rep("H", 3).."O", "O"..rep("H", 3)..rep("S", 10)..rep("H", 3).."O", "O".."HHH".."SDDDSSDDDS".."HHH".."O", "O".."HHH".."SeDESSeDES".."HHH".."O", "O".."HHH".."SEEESSEEES".."HHH".."O", "O".."HHH".."PPSSSSSSPP".."HHH".."O", "O".."hHH".."SSSSMMSSSS".."HHh".."O", "O".."hHHH".."sSSSSSSs".."HHHh".."O", "OhHH"..".".."sSSSSs"..".".."HHhO", "OhH".."...".."sSSs".."...".."HhO", "ghH"..rep(".", 4).."sSSs"..rep(".", 4).."Hhg", "wWWWBBWWWw", "SwWWWBBWWWwS", "S".."w"..rep("W", 8).."w".."S", "sSWWKKKKWWSs", "k"..rep("K", 10).."k", "k"..rep("K", 12).."k", "k"..rep("K", 14).."k", "WwWwWwWwWwWwWwWw" }
 UI.ROWS, UI.COLS = #UI.girlRows, 22
-UI.girlBaseY = -UI.ROWS * PX + 2
-UI.girl = UI.new("Frame", { Size = UDim2.fromOffset(UI.COLS * PX, UI.ROWS * PX), Position = UDim2.new(0, 720 - 235, 0, UI.girlBaseY), BackgroundTransparency = 1, ZIndex = 20 }, UI.main)
+UI.girl = UI.new("Frame", { Size = UDim2.fromOffset(UI.COLS * PX, UI.ROWS * PX), Position = UDim2.new(0, 720 - 235, 0, -UI.ROWS * PX + 2), BackgroundTransparency = 1, ZIndex = 20 }, UI.main)
 local function makeLeg(col)
-    local c = UI.new("Frame", { Size = UDim2.fromOffset(3 * PX, 14 * PX), Position = UDim2.fromOffset(col * PX, UI.ROWS * PX - 7 * PX - 2), BackgroundTransparency = 1, BorderSizePixel = 0, ZIndex = 1 }, UI.girl)
-    UI.new("Frame", { Position = UDim2.fromOffset(0, 7 * PX), Size = UDim2.fromOffset(3 * PX, 5 * PX), BackgroundColor3 = gp.S, BorderSizePixel = 0 }, c)
-    UI.new("Frame", { Position = UDim2.fromOffset(0, 12 * PX), Size = UDim2.fromOffset(3 * PX + 2, 2 * PX), BackgroundColor3 = gp.k, BorderSizePixel = 0 }, c)
+    local c = UI.new("Frame", { Size = UDim2.fromOffset(3 * PX, 14 * PX), Position = UDim2.fromOffset(col * PX, UI.ROWS * PX - 7 * PX - 2), BackgroundTransparency = 1, ZIndex = 1 }, UI.girl)
+    UI.new("Frame", { Position = UDim2.fromOffset(0, 7 * PX), Size = UDim2.fromOffset(3 * PX, 5 * PX), BackgroundColor3 = gp.S }, c)
+    UI.new("Frame", { Position = UDim2.fromOffset(0, 12 * PX), Size = UDim2.fromOffset(3 * PX + 2, 2 * PX), BackgroundColor3 = gp.k }, c)
     return c
 end
 UI.legL, UI.legR = makeLeg(7), makeLeg(12)
@@ -100,7 +96,7 @@ for y, row in ipairs(UI.girlRows) do
         if ch ~= "." then
             local e = x
             while e < #row and row:sub(e + 1, e + 1) == ch do e = e + 1 end
-            UI.new("Frame", { Position = UDim2.fromOffset((pad + x - 1) * PX, (y - 1) * PX), Size = UDim2.fromOffset((e - x + 1) * PX, PX), BackgroundColor3 = gp[ch], BorderSizePixel = 0 }, sprite)
+            UI.new("Frame", { Position = UDim2.fromOffset((pad + x - 1) * PX, (y - 1) * PX), Size = UDim2.fromOffset((e - x + 1) * PX, PX), BackgroundColor3 = gp[ch] }, sprite)
             x = e + 1
         else x = x + 1 end
     end
@@ -110,19 +106,6 @@ end
 local header = UI.new("Frame", { Size = UDim2.new(1, 0, 0, 44), BackgroundTransparency = 1, Active = true, ZIndex = 5 }, UI.main)
 local minBtn = UI.new("TextButton", { Size = UDim2.fromOffset(28, 28), Position = UDim2.new(1, -114, 0, 12), BackgroundColor3 = UI.BG1, Font = Enum.Font.GothamBold, TextSize = 13, TextColor3 = UI.DIM, Text = "–" }, header); UI.corner(minBtn, UDim.new(1, 0))
 local closeBtn = UI.new("TextButton", { Size = UDim2.fromOffset(28, 28), Position = UDim2.new(1, -42, 0, 12), BackgroundColor3 = UI.BG1, Font = Enum.Font.GothamBold, TextSize = 13, TextColor3 = UI.DIM, Text = "✕" }, header); UI.corner(closeBtn, UDim.new(1, 0))
-UI.dragging, UI.dragStart, UI.startPos = false, nil, nil
-UI.conns[#UI.conns + 1] = header.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        UI.dragging, UI.dragStart, UI.startPos = true, input.Position, UI.main.Position
-        input.Changed:Connect(function() if input.UserInputState == Enum.UserInputState.End then UI.dragging = false end end)
-    end
-end)
-UI.conns[#UI.conns + 1] = UIS.InputChanged:Connect(function(input)
-    if UI.dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-        local d = (input.Position - UI.dragStart) / UI.scaleObj.Scale
-        UI.main.Position = UDim2.new(UI.startPos.X.Scale, UI.startPos.X.Offset + d.X, UI.startPos.Y.Scale, UI.startPos.Y.Offset + d.Y)
-    end
-end)
 minBtn.Activated:Connect(UI.toggleWindow); closeBtn.Activated:Connect(UI.toggleWindow)
 
 UI.tabsFrame = UI.new("Frame", { AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, -10, 0, 46), Size = UDim2.fromOffset(0, 38), AutomaticSize = Enum.AutomaticSize.X, BackgroundColor3 = Color3.fromRGB(22, 22, 25), ZIndex = 5 }, UI.main)
