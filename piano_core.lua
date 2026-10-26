@@ -1,9 +1,14 @@
 --============================================================
--- SWILL Piano Core
+--  SWILL • Piano Core (Мозг скрипта)
 --============================================================
+local Players = game:GetService("Players")
+local VIM = game:GetService("VirtualInputManager")
+local HttpService = game:GetService("HttpService")
+
 local Core = {}
 Core.held = {}
 
+-- Клавиатура
 Core.keyMap = {}
 for _, L in ipairs({"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"}) do
     Core.keyMap[L:lower()] = { key = Enum.KeyCode[L], shift = false }
@@ -47,7 +52,6 @@ function Core.transposeChars(str, n)
 end
 
 function Core.keyDown(info)
-    local VIM = game:GetService("VirtualInputManager")
     if info.shift then VIM:SendKeyEvent(true, Enum.KeyCode.LeftShift, false, game) end
     VIM:SendKeyEvent(true, info.key, false, game)
     if info.shift then VIM:SendKeyEvent(false, Enum.KeyCode.LeftShift, false, game) end
@@ -55,13 +59,11 @@ function Core.keyDown(info)
 end
 
 function Core.keyUp(info)
-    local VIM = game:GetService("VirtualInputManager")
     VIM:SendKeyEvent(false, info.key, false, game)
     Core.held[info.key] = nil
 end
 
 function Core.releaseAll()
-    local VIM = game:GetService("VirtualInputManager")
     for k in pairs(Core.held) do VIM:SendKeyEvent(false, k, false, game) end
     Core.held = {}
 end
@@ -108,13 +110,7 @@ function Core.buildEvents(text, trans)
 end
 
 function Core.readClipboard()
-    local fns = {
-        function() return getclipboard() end,
-        function() return syn.get_clipboard() end,
-        function() return get_clipboard() end,
-        function() return readclipboard() end,
-        function() return fromclipboard() end,
-    }
+    local fns = { getclipboard, function() return syn.get_clipboard() end, readclipboard, fromclipboard }
     for _, f in ipairs(fns) do
         local ok, v = pcall(f)
         if ok and type(v) == "string" and v ~= "" then return v end
@@ -123,14 +119,14 @@ function Core.readClipboard()
 end
 
 function Core.saveSongs(songs)
-    pcall(function() if writefile then writefile("SWILL_Piano_Songs.json", game:GetService("HttpService"):JSONEncode(songs)) end end)
+    pcall(function() if writefile then writefile("SWILL_Piano_Songs.json", HttpService:JSONEncode(songs)) end end)
 end
 
 function Core.loadSongs()
     local songs = {}
     pcall(function()
         if isfile and isfile("SWILL_Piano_Songs.json") then
-            local d = game:GetService("HttpService"):JSONDecode(readfile("SWILL_Piano_Songs.json"))
+            local d = HttpService:JSONDecode(readfile("SWILL_Piano_Songs.json"))
             if type(d) == "table" then songs = d end
         end
     end)
