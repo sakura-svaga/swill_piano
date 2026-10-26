@@ -1,5 +1,5 @@
 --============================================================
---  SWILL • Piano Ultra v4 (FIXED & POLISHED)
+--  SWILL • Piano Ultra v4 (FULL FIX)
 --============================================================
 
 local Players      = game:GetService("Players")
@@ -251,7 +251,7 @@ melodyBox = new("TextBox", { Position = UDim2.fromOffset(15, 0), Size = UDim2.ne
 sendBtn = new("TextButton", { AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -8, 0.5, 0), Size = UDim2.fromOffset(40, 40), BackgroundColor3 = ACC(), Text = "▶", Font = Enum.Font.GothamBold, TextSize = 16, TextColor3 = Color3.new(0,0,0) }, inputBar); corner(sendBtn, 12)
 
 playBtn = new("TextButton", { Size = UDim2.fromOffset(100, 40), BackgroundColor3 = ACC(), Text = "▶ Играть", Font = Enum.Font.GothamBold, TextSize = 13, TextColor3 = Color3.new(0,0,0) }, homePage); corner(playBtn, 10)
-stopBtn = new("TextButton", { Size = UDim2.fromOffset(100, 40), BackgroundColor3 = BG2, Text = = "■ Стоп", Font = Enum.Font.GothamBold, TextSize = 13, TextColor3 = TXT }, homePage); corner(stopBtn, 10)
+stopBtn = new("TextButton", { Size = UDim2.fromOffset(100, 40), BackgroundColor3 = BG2, Text = "■ Стоп", Font = Enum.Font.GothamBold, TextSize = 13, TextColor3 = TXT }, homePage); corner(stopBtn, 10)
 clearBtn = new("TextButton", { Size = UDim2.fromOffset(100, 40), BackgroundColor3 = BG2, Text = "Очистить", Font = Enum.Font.GothamBold, TextSize = 13, TextColor3 = TXT }, homePage); corner(clearBtn, 10)
 
 -- Вкладка Игра (Кнопки вместо слайдеров)
@@ -303,18 +303,24 @@ makeToggle(pageSet, "doodles", "Фон-дудлы")
 pageGuide = makePage("guide")
 new("TextLabel", { Size = UDim2.new(1, 0, 0, 100), BackgroundTransparency = 1, Font = Enum.Font.Gotham, TextSize = 13, TextColor3 = TXT, TextWrapped = true, Text = "1. Вставь мелодию в строку внизу.\n2. Нажми 'Играть'.\n3. Настрой темп и т.д." }, pageGuide)
 
--- Игра
+-- Игра (ИСПРАВЛЕНА ОШИБКА С ЗАВИСАНИЕМ)
 state = { playing = false, id = 0, progress = 0 }
 function playEvents(events, my)
+    local t0 = os.clock()
+    local ideal = 0
     for i, ev in ipairs(events) do
         if state.id ~= my then break end
+        local dur = (ev.t == "r") and restDur() or noteDur()
+        ideal = ideal + dur
+        local target = t0 + ideal
+        local w = target - os.clock()
+        if w > 0 then task.wait(w) end
         state.progress = i / #events
         if ev.t == "n" then
             for _, ch in ipairs(ev.keys) do keyDown(keyMap[ch]) end
-            task.wait(S.hold)
+            task.wait(math.min(S.hold, dur * 0.8))
             for _, ch in ipairs(ev.keys) do keyUp(keyMap[ch]) end
-            task.wait(S.gap)
-        else task.wait(S.rest) end
+        end
     end
     if state.id == my then state.playing = false; sendBtn.Text = "▶" end
 end
