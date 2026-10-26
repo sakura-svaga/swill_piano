@@ -1,6 +1,5 @@
 local Core = {}
 Core.held = {}
-
 Core.keyMap = {}
 for _, L in ipairs({"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"}) do
     Core.keyMap[L:lower()] = { key = Enum.KeyCode[L], shift = false }
@@ -8,24 +7,15 @@ for _, L in ipairs({"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O",
 end
 local digitNames = {"Zero","One","Two","Three","Four","Five","Six","Seven","Eight","Nine"}
 for i = 0, 9 do Core.keyMap[tostring(i)] = { key = Enum.KeyCode[digitNames[i + 1]], shift = false } end
-Core.keyMap["!"] = { key = Enum.KeyCode.One,   shift = true }
-Core.keyMap["@"] = { key = Enum.KeyCode.Two,   shift = true }
-Core.keyMap["$"] = { key = Enum.KeyCode.Four,  shift = true }
-Core.keyMap["%"] = { key = Enum.KeyCode.Five,  shift = true }
-Core.keyMap["^"] = { key = Enum.KeyCode.Six,   shift = true }
-Core.keyMap["*"] = { key = Enum.KeyCode.Eight, shift = true }
-Core.keyMap["("] = { key = Enum.KeyCode.Nine,  shift = true }
-Core.keyMap["-"]  = { key = Enum.KeyCode.Minus,        shift = false }
-Core.keyMap["="]  = { key = Enum.KeyCode.Equals,       shift = false }
-Core.keyMap["["]  = { key = Enum.KeyCode.LeftBracket,  shift = false }
-Core.keyMap["]"]  = { key = Enum.KeyCode.RightBracket, shift = false }
-Core.keyMap[";"]  = { key = Enum.KeyCode.Semicolon,    shift = false }
-Core.keyMap["'"]  = { key = Enum.KeyCode.Quote,        shift = false }
-Core.keyMap[","]  = { key = Enum.KeyCode.Comma,        shift = false }
-Core.keyMap["."]  = { key = Enum.KeyCode.Period,       shift = false }
-Core.keyMap["/"]  = { key = Enum.KeyCode.Slash,        shift = false }
-Core.keyMap["\\"] = { key = Enum.KeyCode.BackSlash,    shift = false }
-Core.keyMap["`"]  = { key = Enum.KeyCode.Backquote,    shift = false }
+Core.keyMap["!"] = { key = Enum.KeyCode.One, shift = true }; Core.keyMap["@"] = { key = Enum.KeyCode.Two, shift = true }
+Core.keyMap["$"] = { key = Enum.KeyCode.Four, shift = true }; Core.keyMap["%"] = { key = Enum.KeyCode.Five, shift = true }
+Core.keyMap["^"] = { key = Enum.KeyCode.Six, shift = true }; Core.keyMap["*"] = { key = Enum.KeyCode.Eight, shift = true }
+Core.keyMap["("] = { key = Enum.KeyCode.Nine, shift = true }; Core.keyMap["-"] = { key = Enum.KeyCode.Minus, shift = false }
+Core.keyMap["="] = { key = Enum.KeyCode.Equals, shift = false }; Core.keyMap["["] = { key = Enum.KeyCode.LeftBracket, shift = false }
+Core.keyMap["]"] = { key = Enum.KeyCode.RightBracket, shift = false }; Core.keyMap[";"] = { key = Enum.KeyCode.Semicolon, shift = false }
+Core.keyMap["'"] = { key = Enum.KeyCode.Quote, shift = false }; Core.keyMap[","] = { key = Enum.KeyCode.Comma, shift = false }
+Core.keyMap["."] = { key = Enum.KeyCode.Period, shift = false }; Core.keyMap["/"] = { key = Enum.KeyCode.Slash, shift = false }
+Core.keyMap["\\"] = { key = Enum.KeyCode.BackSlash, shift = false }; Core.keyMap["`"] = { key = Enum.KeyCode.Backquote, shift = false }
 
 local SEQ = "1!2@34$5%6^78*9(0qQwWeErtTyYuiIoOpPasSdDfgGhHjJklLzZxcCvVbBnm"
 local SEQ_IDX = {}
